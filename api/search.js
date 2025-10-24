@@ -11,24 +11,29 @@ export default async function handler(req, res) {
         "Content-Type": "application/json",
         Authorization: `Bearer ${TAVILY_API_KEY}`,
       },
-      body: JSON.stringify({ query, max_results: 5 }),
+      body: JSON.stringify({ 
+        query, 
+        max_results: 5,
+      }),
     });
 
     const tavilyData = await tavilyResponse.json();
     const results = tavilyData.results || [];
 
-    // Format results as context
+    // 2️⃣ Build context for Claude
     const contextText = results.length
       ? results.map((r, i) => `${i + 1}) ${r.title}\n${r.content}\nSource: ${r.url}`).join("\n\n")
       : "No relevant Tavily results found.";
 
-    // 2️⃣ Claude prompt
+    // 3️⃣ Prompt for Claude
     const prompt = `
 System: You are an expert AI engineering assistant.
-Tone: confident, concise, direct. Use active voice.
-Only use the sources provided in 'evidence'. Quantify uncertainty if needed.
+Tone rules: confident, concise, direct. Use active voice.
+If uncertain about a fact, quantify uncertainty and give a short plan to verify.
 
-Respond using this JSON schema ONLY:
+Respond using ONLY the sources listed in 'evidence' unless explicitly marked speculation.
+Output must match this exact JSON schema:
+Output only valid JSON. Do not wrap the JSON in markdown, code fences, or strings. Each key must be top-level.
 {
   "intent": "string",
   "confidence": "string",
@@ -44,13 +49,13 @@ Respond using this JSON schema ONLY:
   "nextSteps": ["string"]
 }
 
-CONTEXT (evidence from Tavily):
+CONTEXT:
 ${contextText}
 
 QUESTION: ${query}
 `;
 
-    // 3️⃣ Call Claude
+    // 4️⃣ Claude API call
     let answer = {};
     try {
       const claudeResponse = await fetch("https://api.anthropic.com/v1/messages", {
@@ -62,7 +67,7 @@ QUESTION: ${query}
         },
         body: JSON.stringify({
           model: "claude-3-5-sonnet-20241022",
-          max_tokens: 1500,
+          max_tokens: 2000,
           messages: [{ role: "user", content: prompt }],
         }),
       });
@@ -70,10 +75,17 @@ QUESTION: ${query}
       const claudeData = await claudeResponse.json();
       const rawText = claudeData?.content?.[0]?.text || "{}";
 
+      // ✅ Extract JSON from raw text
       try {
-        answer = JSON.parse(rawText);
-      } catch {
-        answer = { tldr: rawText || "Claude response parse failed." };
+        const jsonMatch = rawText.match(/\{[\s\S]*\}/); // Grab JSON block
+        if (jsonMatch) {
+          answer = JSON.parse(jsonMatch[0]);
+        } else {
+          answer = { tldr: rawText };
+        }
+      } catch (e) {
+        console.error("Claude JSON parse error:", e);
+        answer = { tldr: rawText };
       }
     } catch (e) {
       console.error("Claude API error:", e);
@@ -81,6 +93,7 @@ QUESTION: ${query}
     }
 
     res.status(200).json({ results, answer });
+
   } catch (err) {
     console.error("Tavily fetch error:", err);
     res.status(500).json({ error: "Server error." });
