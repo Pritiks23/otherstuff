@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Melinoë — Ask. Retrieve. Understand</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      font-family: 'Inter', 'Space Grotesk', 'Roboto Mono', monospace;
+      background-color: #050505;
+      color: white;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      text-align: center;
+      padding: 2rem 1rem;
+      position: relative; /* needed for absolute pricing button */
+    }
+
+    #pricing-button {
+      position: absolute;
+      top: 1.5rem;
+      right: 2rem;
+      z-index: 10;
+      background: linear-gradient(90deg, #00bfff, #0077ff);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.3s;
+      text-decoration: none;
+    }
+    #pricing-button:hover {
+      opacity: 0.9;
+      transform: scale(1.03);
+    }
+
+    /* === Chat Section === */
+    #chat-section {
+      max-width: 900px;
+      margin: 0 auto;
+      text-align: left;
+      padding: 2rem;
+    }
+
+    /* Blue glowing container for input */
+    #chat-input-box {
+      background: linear-gradient(135deg, rgba(0, 128, 255, 0.15), rgba(0, 255, 255, 0.15));
+      border: 1px solid rgba(0, 180, 255, 0.4);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      box-shadow: 0 0 20px rgba(0, 150, 255, 0.15);
+      backdrop-filter: blur(10px);
+      margin-bottom: 2rem;
+    }
+
+    #chat-form {
+      display: flex;
+      gap: 10px;
+    }
+
+    #user-input {
+      flex: 1;
+      padding: 12px;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: 1px solid #333;
+      background-color: #0a0a0a;
+      color: #fff;
+      outline: none;
+      transition: border 0.3s;
+    }
+
+    #user-input:focus {
+      border-color: #00aaff;
+      box-shadow: 0 0 8px #0077ff;
+    }
+
+    button {
+      background: linear-gradient(90deg, #00bfff, #0077ff);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 20px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      opacity: 0.9;
+      transform: scale(1.03);
+    }
+
+    #chatbox {
+      margin-top: 2rem;
+    }
+
+    #messages {
+      background-color: #000000;
+      padding: 1.5rem;
+      border-radius: 1rem;
+      white-space: pre-wrap;
+      font-family: 'Roboto Mono', monospace;
+      color: #f2f2f2;
+      overflow-y: auto;
+      max-height: 600px;
+    }
+
+    #categories {
+      margin-top: 4rem;
+      text-align: center;
+    }
+
+    /* === Intro Modal Styles === */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.8);
+    }
+
+    .modal-content {
+      position: relative;
+      margin: 5% auto;
+      width: 80%;
+      max-width: 900px;
+      background-color: #000;
+      padding: 1rem;
+      border-radius: 12px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+    }
+
+    .close {
+      position: absolute;
+      top: 0.5rem;
+      right: 1rem;
+      color: #fff;
+      font-size: 2rem;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .close:hover {
+      color: #0f62fe;
+    }
+
+    #dont-show-again {
+      margin-right: 0.3rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Intro Video Modal -->
+  <div id="intro-modal" class="modal">
+    <div class="modal-content">
+      <span id="close-modal" class="close">&times;</span>
+
+      <div style="position: relative; width: 100%; height: 0; padding-top: 56.25%; padding-bottom: 0; box-shadow: 0 2px 8px rgba(63,69,81,0.16); margin-top: 1.6em; margin-bottom: 0.9em; overflow: hidden; border-radius: 8px; will-change: transform;">
+        <iframe 
+          loading="lazy" 
+          style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none; padding: 0; margin: 0;" 
+          src="https://www.canva.com/design/DAG17LeO8to/LJplzZ44_QUMLJbKQXSQPQ/watch?embed" 
+          allowfullscreen="allowfullscreen" 
+          allow="fullscreen">
+        </iframe>
+      </div>
+
+      <p style="color: #aaa; text-align: center; margin-top: 0.5rem; font-size: 0.9rem;">
+          Melinoe: The Ultimate AI Knowledge base for Developers
+      </p>
+
+      <div style="margin-top: 1rem; text-align: center;">
+        <label style="color: #fff; font-size: 0.9rem;">
+          <input type="checkbox" id="dont-show-again" /> Don't show again
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <header>
+    <a id="pricing-button" href="pricing.html">Pricing</a>
+
+    <div class="branding" style="text-align: center; margin-bottom: 2rem;">
+      <img src="https://www.bing.com/th/id/BCO.41dad128-a511-4064-ad3e-61de1ab5967c.png" 
+           alt="Melinoë Logo" class="logo" 
+           style="height: 120px; width: auto; display: block; margin: 0 auto 1rem auto;" />
+      <h1 class="company-name" style="font-size: 3rem; margin: 0; color: #ffffff;">Melinoë</h1>
+    </div>
+
+    <h1 style="font-size: 2.5rem; margin-top: 20px;">
+      Ask. Retrieve. Understand — <span style="color:#ffffff;">instantly.</span>
+    </h1>
+
+    <p style="font-size: 1.3rem; color:#ccc; margin-bottom: 30px;">
+      Answers that think like an engineer.
+    </p>
+  </header>
+
+  <section id="chat-section">
+    <div id="chat-input-box">
+      <form id="chat-form">
+        <input type="text" id="user-input" placeholder="Ask any AI engineering question..." required />
+        <button type="submit">Search</button>
+      </form>
+    </div>
+
+    <div id="chatbox">
+      <h2>Answers</h2>
+      <div id="messages"></div>
+    </div>
+  </section>
+
+  <section id="categories">
+    <h2>Explore by Category</h2>
+    <p>Dive deep into specialized AI/ML topics</p>
+    <div class="grid">
+      <a href="guides/rag.html" class="card"><h3>RAG</h3><p>Retrieval-Augmented Generation</p></a>
+      <a href="guides/embeddings.html" class="card"><h3>Embeddings</h3><p>Vector representations & models</p></a>
+      <a href="guides/vector-dbs.html" class="card"><h3>Vector Databases</h3><p>Pinecone, Weaviate, Chroma</p></a>
+      <a href="guides/fine-tuning.html" class="card"><h3>Fine-tuning</h3><p>Model customization</p></a>
+      <a href="guides/prompt-engineering.html" class="card"><h3>Prompt Engineering</h3><p>Effective prompting techniques</p></a>
+      <a href="guides/model-selection.html" class="card"><h3>Model Selection</h3><p>Choosing the right LLM</p></a>
+      <a href="guides/ai-safety.html" class="card"><h3>AI Safety</h3><p>Alignment & safety practices</p></a>
+      <a href="guides/ai-agents.html" class="card"><h3>Agents</h3><p>Autonomous AI systems</p></a>
+    </div>
+  </section>
+
+  <script src="script.js"></script>
+  <script>
+    // --- Intro Video Modal with "Don't show again" ---
+    function setCookie(name, value, days) {
+      const d = new Date();
+      d.setTime(d.getTime() + (days*24*60*60*1000));
+      document.cookie = `${name}=${value};expires=${d.toUTCString()};path=/`;
+    }
+
+    function getCookie(name) {
+      const match = document.cookie.match(new RegExp('(^| )'+name+'=([^;]+)'));
+      return match ? match[2] : null;
+    }
+
+    window.addEventListener('load', () => {
+      const modal = document.getElementById('intro-modal');
+      const closeBtn = document.getElementById('close-modal');
+      const dontShowCheckbox = document.getElementById('dont-show-again');
+
+      // Only show modal if cookie not set
+      if (getCookie('hideIntroModal') === 'true') return;
+
+      modal.style.display = 'block';
+
+      closeBtn.onclick = () => {
+        if (dontShowCheckbox.checked) setCookie('hideIntroModal', 'true', 365);
+        modal.style.display = 'none';
+      };
+
+      window.onclick = (event) => {
+        if (event.target === modal) {
+          if (dontShowCheckbox.checked) setCookie('hideIntroModal', 'true', 365);
+          modal.style.display = 'none';
+        }
+      };
+    });
+  </script>
+</body>
+</html>
+
+
+
